@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'dependent_protect'
   s.version           = '0.0.2'
-  s.date              = '2012-04-09'
+  s.date              = '2012-04-29'
   s.rubyforge_project = 'dependent_protect'
 
   ## Make sure your summary is short. The description may be as long
@@ -47,7 +47,7 @@ Gem::Specification.new do |s|
 
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.
-  s.add_dependency('activerecord', [">= 2.3.0", "< 3.0.0"])
+  s.add_dependency('activerecord', [">= 2.3.0", "< 4.0.0"])
 
   ## List your development dependencies here. Development dependencies are
   ## those that are only needed during development
@@ -63,6 +63,8 @@ Gem::Specification.new do |s|
     README.md
     Rakefile
     dependent_protect.gemspec
+    gemfiles/rails2.gemfile
+    gemfiles/rails3.gemfile
     lib/dependent_protect.rb
     spec/dependent_protect_spec.rb
     spec/schema.rb

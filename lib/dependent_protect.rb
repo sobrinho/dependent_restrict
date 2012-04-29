@@ -1,6 +1,6 @@
 # DependentProtect
 #
-require 'activerecord'
+require 'active_record'
 
 module DependentProtect
   VERSION = '0.0.2'
