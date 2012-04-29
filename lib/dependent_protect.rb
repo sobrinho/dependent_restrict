@@ -3,7 +3,7 @@
 require 'active_record'
 
 module DependentProtect
-  VERSION = '0.0.2'
+  VERSION = '0.0.3'
 
   DESTROY_PROTECT_ERROR_MESSAGE = 'Cant destroy because there are dependent_count dependent_type dependent on dependee_type dependee.\n\n\nThese include:\ndependent_examples'
 
