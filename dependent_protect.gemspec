@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'dependent_protect'
   s.version           = '0.0.3'
-  s.date              = '2012-04-29'
+  s.date              = '2012-06-10'
   s.rubyforge_project = 'dependent_protect'
 
   ## Make sure your summary is short. The description may be as long
@@ -66,6 +66,7 @@ Gem::Specification.new do |s|
     gemfiles/rails2.gemfile
     gemfiles/rails3.gemfile
     lib/dependent_protect.rb
+    lib/dependent_protect/delete_restriction_error.rb
     spec/dependent_protect_spec.rb
     spec/schema.rb
     spec/spec_helper.rb

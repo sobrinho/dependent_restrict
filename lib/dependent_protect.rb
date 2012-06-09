@@ -1,18 +1,14 @@
 # DependentProtect
 #
 require 'active_record'
+require 'dependent_protect/delete_restriction_error'
 
 module DependentProtect
   VERSION = '0.0.3'
 
-  DESTROY_PROTECT_ERROR_MESSAGE = 'Cant destroy because there are dependent_count dependent_type dependent on dependee_type dependee.\n\n\nThese include:\ndependent_examples'
-
   def self.included(base)
     super
     base.extend(ClassMethods)
-
-    klass = Class.new(ActiveRecord::ActiveRecordError)
-    ActiveRecord.const_set('DependencyError', klass)
 
     base.class_eval do
       class << self
@@ -47,49 +43,30 @@ module DependentProtect
 
     private
     def add_dependency_callback!(reflection, options)
-      # This would break if has_many :dependent behaviour changes. One
-      # solution is removing both the second when and the else branches but
-      # the exception message wouldn't be exact.
-      condition = if reflection.collection?
-        "record.#{reflection.name}.empty?"
-      else
-        "record.#{reflection.name}.nil?"
-      end
-
       case reflection.options[:dependent]
       when :rollback
         options.delete(:dependent)
-        module_eval "before_destroy, :protect_rollback, :unless => proc{ |record| #{condition} }"
-      when :raise
+        method_name = "dependent_rollback_for_#{reflection.name}".to_sym
+        define_method(method_name) do
+          method = reflection.collection? ? :empty? : :nil?
+          unless send(reflection.name).send(method)
+            raise ActiveRecord::Rollback
+          end
+        end
+        before_destroy method_name
+      when :restrict
         options.delete(:dependent)
-        error = reflection.collection? ? dependency_error(reflection) : "Cannot remove as the associated object is dependent on this."
-        module_eval <<-METHOD
-def protect_raise_#{reflection.name}
-  raise ActiveRecord::DependencyError, "#{error}"
-end
-METHOD
-        module_eval "before_destroy :protect_raise_#{reflection.name}, :unless => proc{ |record| #{condition} }"
+        method_name = "dependent_restrict_for_#{reflection.name}".to_sym
+        define_method(method_name) do
+          method = reflection.collection? ? :empty? : :nil?
+          unless send(reflection.name).send(method)
+            raise ActiveRecord::DeleteRestrictionError.new(reflection, self)
+          end
+        end
+        before_destroy method_name
       end
     end
-
-    def protect_rollback
-      raise ActiveRecord::Rollback
-    end
-
-    def dependency_error(reflection)
-      # TODO: gotta be a more easier approach!
-      count_code = "#{reflection.name}.count"
-      first_five_code = reflection.name.to_s+'.first(5).map{|o| "#{o.id}: #{o.to_s}"}'
-      DESTROY_PROTECT_ERROR_MESSAGE.
-        gsub('dependent_type', reflection.class_name.to_s.underscore.gsub('_', ' ').pluralize).
-        gsub('dependent_examples', '#{(' + first_five_code + ' + [("...and #{' + count_code + ' - 5} more" if ' + count_code + ' > 5)]).join("\n")}').
-        gsub('dependent_count', '#{' + count_code + '}').
-        gsub('dependee_type', '#{self.class.to_s.underscore.gsub(\'_\', \' \')}').
-        gsub('dependee', '#{self}')
-    end
-
   end
 end
-
 
 ActiveRecord::Base.send(:include, DependentProtect)
