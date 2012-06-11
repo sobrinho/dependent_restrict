@@ -38,6 +38,7 @@ module DependentProtect
     def has_and_belongs_to_many_with_protect(association_id, options = {}, &extension)
       reflection = create_reflection(:has_and_belongs_to_many, association_id, options, self)
       add_dependency_callback!(reflection, options)
+      options.delete(:dependent)
       has_and_belongs_to_many_without_protect(association_id, options, &extension)
     end
 
