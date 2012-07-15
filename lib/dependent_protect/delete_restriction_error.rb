@@ -1,5 +1,3 @@
-require 'active_record/associations'
-
 module ActiveRecord
   # This error is raised when trying to destroy a parent instance in N:1 or 1:1 associations
   # (has_many, has_one) when there is at least 1 child associated instance.

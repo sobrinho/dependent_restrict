@@ -4,7 +4,7 @@ require 'active_record'
 require 'dependent_protect/delete_restriction_error'
 
 module DependentProtect
-  VERSION = '0.0.5'
+  VERSION = '0.0.6'
 
   def self.included(base)
     super
