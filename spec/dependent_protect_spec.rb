@@ -31,30 +31,36 @@ describe DependentProtect do
   it 'should restrict has_many relationships' do
     category = Category.create!
     5.times { Order.create!(:category => category) }
-    lambda{category.reload.destroy}.should raise_error(ActiveRecord::DeleteRestrictionError, 'Cannot delete record because 5 dependent orders exist')
+    expect { category.reload.destroy }.to raise_error(
+      ActiveRecord::DetailedDeleteRestrictionError,
+      'Cannot delete record because 5 dependent orders exist'
+    )
     begin
       category.destroy
-    rescue ActiveRecord::DeleteRestrictionError => e
+    rescue ActiveRecord::DetailedDeleteRestrictionError => e
       e.detailed_message.should == "Cannot delete record because 5 dependent orders exist\n\n\nThese include:\n1: Order 1\n2: Order 2\n3: Order 3\n4: Order 4\n5: Order 5"
     end
     1.times { Order.create!(:category => category) }
     begin
       category.destroy
-    rescue ActiveRecord::DeleteRestrictionError => e
+    rescue ActiveRecord::DetailedDeleteRestrictionError => e
       e.detailed_message.should == "Cannot delete record because 6 dependent orders exist\n\n\nThese include:\n1: Order 1\n2: Order 2\n3: Order 3\n4: Order 4\n...and 2 more"
     end
 
     Order.destroy_all
-    lambda{category.reload.destroy}.should_not raise_error
+    expect{category.reload.destroy}.to_not raise_error
   end
 
   it 'should restrict has_one relationships' do
     order = Order.create!
     order_invoice = OrderInvoice.create!(:order => order)
-    lambda{order.reload.destroy}.should raise_error(ActiveRecord::DeleteRestrictionError, 'Cannot delete record because dependent order invoice exists')
+    expect{order.reload.destroy}.to raise_error(
+      ActiveRecord::DetailedDeleteRestrictionError,
+      'Cannot delete record because dependent order invoice exists'
+    )
 
     order_invoice.destroy
-    lambda{order.reload.destroy}.should_not raise_error
+    expect{order.reload.destroy}.to_not raise_error
   end
 end
 

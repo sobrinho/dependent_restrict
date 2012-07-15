@@ -4,7 +4,7 @@ require 'active_record'
 require 'dependent_protect/delete_restriction_error'
 
 module DependentProtect
-  VERSION = '0.0.4'
+  VERSION = '0.0.5'
 
   def self.included(base)
     super
@@ -61,7 +61,7 @@ module DependentProtect
         define_method(method_name) do
           method = reflection.collection? ? :empty? : :nil?
           unless send(reflection.name).send(method)
-            raise ActiveRecord::DeleteRestrictionError.new(reflection, self)
+            raise ActiveRecord::DetailedDeleteRestrictionError.new(reflection.name, self)
           end
         end
         before_destroy method_name
