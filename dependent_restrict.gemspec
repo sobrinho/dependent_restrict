@@ -12,14 +12,14 @@ Gem::Specification.new do |s|
   ## Leave these as is they will be modified for you by the rake gemspec task.
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
-  s.name              = 'dependent_protect'
-  s.version           = '0.0.6'
-  s.date              = '2012-07-15'
-  s.rubyforge_project = 'dependent_protect'
+  s.name              = 'dependent_restrict'
+  s.version           = '0.1.0'
+  s.date              = '2013-09-14'
+  s.rubyforge_project = 'dependent_restrict'
 
   ## Make sure your summary is short. The description may be as long
   ## as you like.
-  s.summary     = "Add dependent protect/restrict functionality to ActiveRecord 2.x."
+  s.summary     = "Add dependent restrict and improves functionality to ActiveRecord 2/3/4.x."
   s.description = "This gem is not needed in Rails 3 as dependent => :raise is included in 3.0."
 
   ## List the primary authors. If there are a bunch of authors, it's probably
@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   ## a custom homepage, consider using your GitHub URL or the like.
   s.authors  = ["Michael Noack"]
   s.email    = 'development@travellink.com.au'
-  s.homepage = 'http://github.com/sealink/dependent_protect'
+  s.homepage = 'http://github.com/sealink/dependent_restrict'
 
   ## This gets added to the $LOAD_PATH so that 'lib/NAME.rb' can be required as
   ## require 'NAME.rb' or'/lib/NAME/file.rb' can be as require 'NAME/file.rb'
@@ -62,11 +62,12 @@ Gem::Specification.new do |s|
     LICENSE
     README.md
     Rakefile
-    dependent_protect.gemspec
+    dependent_restrict.gemspec
     gemfiles/rails2.gemfile
     gemfiles/rails3.gemfile
-    lib/dependent_protect.rb
-    lib/dependent_protect/delete_restriction_error.rb
+    gemfiles/rails4.gemfile
+    lib/dependent_restrict.rb
+    lib/dependent_restrict/delete_restriction_error.rb
     spec/dependent_protect_spec.rb
     spec/schema.rb
     spec/spec_helper.rb

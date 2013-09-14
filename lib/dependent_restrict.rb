@@ -1,9 +1,7 @@
-# DependentProtect
-#
 require 'active_record'
-require 'dependent_protect/delete_restriction_error'
+require 'dependent_restrict/delete_restriction_error'
 
-module DependentProtect
+module DependentRestrict
   VERSION = '0.1.0'
 
   def self.included(base)
@@ -12,9 +10,9 @@ module DependentProtect
 
     base.class_eval do
       class << self
-        alias_method_chain :has_one, :protect
-        alias_method_chain :has_many, :protect
-        alias_method_chain :has_and_belongs_to_many, :protect
+        alias_method_chain :has_one, :restrict
+        alias_method_chain :has_many, :restrict
+        alias_method_chain :has_and_belongs_to_many, :restrict
       end
     end
   end
@@ -23,7 +21,7 @@ module DependentProtect
     # We should be aliasing configure_dependency_for_has_many but that method
     # is private so we can't. We alias has_many instead trying to be as fair
     # as we can to the original behaviour.
-    def has_one_with_protect(*args) #:nodoc:
+    def has_one_with_restrict(*args) #:nodoc:
       reflection = if active_record_4?
         association_id, options, scope, extension = *args
         create_reflection(:has_one, association_id, options, scope ||= {}, self)
@@ -32,24 +30,24 @@ module DependentProtect
         create_reflection(:has_one, association_id, options, self)
       end
       add_dependency_callback!(reflection, options)
-      has_one_without_protect(*args) #association_id, options, &extension)
+      has_one_without_restrict(*args) #association_id, options, &extension)
     end
 
-    def has_many_with_protect(association_id, options = {}, &extension) #:nodoc:
+    def has_many_with_restrict(association_id, options = {}, &extension) #:nodoc:
       reflection = if active_record_4?
         create_reflection(:has_many, association_id, options, scope ||= {}, self)
       else
         create_reflection(:has_many, association_id, options, self)
       end
       add_dependency_callback!(reflection, options)
-      has_many_without_protect(association_id, options, &extension)
+      has_many_without_restrict(association_id, options, &extension)
     end
 
-    def has_and_belongs_to_many_with_protect(association_id, options = {}, &extension)
+    def has_and_belongs_to_many_with_restrict(association_id, options = {}, &extension)
       reflection = create_reflection(:has_and_belongs_to_many, association_id, options, self)
       add_dependency_callback!(reflection, options)
       options.delete(:dependent)
-      has_and_belongs_to_many_without_protect(association_id, options, &extension)
+      has_and_belongs_to_many_without_restrict(association_id, options, &extension)
     end
 
     private
@@ -86,4 +84,4 @@ module DependentProtect
   end
 end
 
-ActiveRecord::Base.send(:include, DependentProtect)
+ActiveRecord::Base.send(:include, DependentRestrict)

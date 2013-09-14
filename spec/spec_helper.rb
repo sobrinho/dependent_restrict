@@ -19,7 +19,7 @@ if ENV['COVERAGE']
   end
 end
 
-require 'dependent_protect'
+require 'dependent_restrict'
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

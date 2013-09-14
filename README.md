@@ -1,5 +1,5 @@
-Dependent Protect
-=================
+Dependent Restrict
+==================
 
 A gem for rails 2, 3 and 4 that retrofits and improves rails 4 functionality
 

@@ -9,7 +9,7 @@ ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => DB_F
 load 'spec/schema.rb'
 
 
-describe DependentProtect do
+describe DependentRestrict do
   context 'should restrict' do
     before do
       class OrderInvoice < ActiveRecord::Base
