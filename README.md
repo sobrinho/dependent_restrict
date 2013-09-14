@@ -1,21 +1,28 @@
-= dependent => :protect option
+Dependent Protect
+=================
 
-Adds a new option :protect for the parameter <tt>:depends</tt> from +has_many+
-method. This option forbids destroying records with associated records in a
-association created with <tt>:dependent => :protect</tt> option, more or less
-like <tt>ON DELETE RESTRICT</tt> SQL statement. If you try to destroy a record with
-associated records it will raise a
-ActiveRecord::ReferentialIntegrityProtectionError (defined also in this 
-plugin).
+A gem for rails 2, 3 and 4 that retrofits and improves rails 4 functionality
 
-Based on the idea and the code from diego.algorta@gmail.com in Ruby on Rails
-ticket #3837 (http://dev.rubyonrails.org/ticket/3837).
+Rails 4 offers 2 very useful dependent restrictions:
+```ruby
+dependent: :raise_with_exception
+dependent: :raise_with_error
+```
 
-You can download this plugin at:
+In rails 3 it was just:
+```ruby
+dependent: :raise # same sa raise_with_exception
+```
 
-http://svn.ruido-blanco.net/dependent_protect/trunk
+In rails 2 these didn't exist, it was just
+```ruby
+dependent: destroy
+```
 
-== Author
+Which is available in rails 2, 3 and 4
 
-Daniel Rodríguez Troitiño <drodrigueztroitino@yahoo.es>, based on the ideas and
-the code from <diego.algorta@gmail.com>.
+## Differences from standard rails 4
+
+* Error includes detailed message which shows up to 5 of the records that are dependent
+  This is useful for users to know which dependencies must be removed before they can
+  remove the parent record
