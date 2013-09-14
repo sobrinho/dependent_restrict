@@ -25,7 +25,11 @@ describe DependentProtect do
       end
 
       class Category < ActiveRecord::Base
-        has_many :orders, :dependent => :restrict_with_exception
+        has_many :orders, :dependent => :restrict_with_exception do
+          def active
+            self.select(&:active?)
+          end
+        end
         def to_s
           "Category #{id}"
         end
@@ -69,6 +73,16 @@ describe DependentProtect do
 
       order_invoice.destroy
       expect{order.reload.destroy}.to_not raise_error
+    end
+
+    it 'should still filter active' do
+      category = Category.create!
+      3.times { Order.create!(:category => category, :active => true) }
+      2.times { Order.create!(:category => category, :active => false) }
+      category.orders.active.count.should == 3
+
+      Category.delete_all
+      Order.delete_all
     end
   end
 
