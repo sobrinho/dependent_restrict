@@ -70,7 +70,56 @@ describe DependentProtect do
       order_invoice.destroy
       expect{order.reload.destroy}.to_not raise_error
     end
+  end
 
+  context 'should restrict_with_error' do
+    before do
+      class OrderInvoice < ActiveRecord::Base
+        belongs_to :order
+      end
+
+      class Order < ActiveRecord::Base
+        belongs_to :category
+        has_one :order_invoice, :dependent => :restrict_with_error
+        def to_s
+          "Order #{id}"
+        end
+      end
+
+      class Category < ActiveRecord::Base
+        has_many :orders, :dependent => :restrict_with_error
+        def to_s
+          "Category #{id}"
+        end
+      end
+    end
+
+    after do
+      %w(OrderInvoice Order Category).each { |klass| Object.send(:remove_const, klass) }
+    end
+
+    it 'should restrict has_many relationships' do
+      category = Category.create!
+      Category.count.should == 1
+      5.times { Order.create!(:category => category) }
+      category.destroy
+      Category.count.should == 1
+      Order.destroy_all
+      category.reload.destroy
+      Category.count.should == 0
+    end
+
+    it 'should restrict has_one relationships' do
+      order = Order.create!
+      Order.count.should == 1
+      order_invoice = OrderInvoice.create!(:order => order)
+      order.reload.destroy
+      Order.count.should == 1
+
+      order_invoice.destroy
+      order.reload.destroy
+      Order.count.should == 0
+    end
   end
 end
 
