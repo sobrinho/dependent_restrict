@@ -4,7 +4,7 @@ require 'active_record'
 require 'dependent_protect/delete_restriction_error'
 
 module DependentProtect
-  VERSION = '0.0.6'
+  VERSION = '0.1.0'
 
   def self.included(base)
     super
@@ -23,14 +23,24 @@ module DependentProtect
     # We should be aliasing configure_dependency_for_has_many but that method
     # is private so we can't. We alias has_many instead trying to be as fair
     # as we can to the original behaviour.
-    def has_one_with_protect(association_id, options = {}, &extension) #:nodoc:
-      reflection = create_reflection(:has_one, association_id, options, self)
+    def has_one_with_protect(*args) #:nodoc:
+      reflection = if active_record_4?
+        association_id, options, scope, extension = *args
+        create_reflection(:has_one, association_id, options, scope ||= {}, self)
+      else
+        association_id, options, extension = *args
+        create_reflection(:has_one, association_id, options, self)
+      end
       add_dependency_callback!(reflection, options)
-      has_one_without_protect(association_id, options, &extension)
+      has_one_without_protect(*args) #association_id, options, &extension)
     end
 
     def has_many_with_protect(association_id, options = {}, &extension) #:nodoc:
-      reflection = create_reflection(:has_many, association_id, options, self)
+      reflection = if active_record_4?
+        create_reflection(:has_many, association_id, options, scope ||= {}, self)
+      else
+        create_reflection(:has_many, association_id, options, self)
+      end
       add_dependency_callback!(reflection, options)
       has_many_without_protect(association_id, options, &extension)
     end
@@ -43,11 +53,13 @@ module DependentProtect
     end
 
     private
+
     def add_dependency_callback!(reflection, options)
-      case reflection.options[:dependent]
-      when :rollback
+      dependent_type = active_record_4? ? options[:dependent] : reflection.options[:dependent]
+      method_name = "dependent_#{dependent_type}_for_#{reflection.name}"
+      case dependent_type
+      when :rollback, :restrict_with_error
         options.delete(:dependent)
-        method_name = "dependent_rollback_for_#{reflection.name}".to_sym
         define_method(method_name) do
           method = reflection.collection? ? :empty? : :nil?
           unless send(reflection.name).send(method)
@@ -55,9 +67,8 @@ module DependentProtect
           end
         end
         before_destroy method_name
-      when :restrict
+      when :restrict, :restrict_with_exception
         options.delete(:dependent)
-        method_name = "dependent_restrict_for_#{reflection.name}".to_sym
         define_method(method_name) do
           method = reflection.collection? ? :empty? : :nil?
           unless send(reflection.name).send(method)
@@ -67,6 +78,11 @@ module DependentProtect
         before_destroy method_name
       end
     end
+
+    def active_record_4?
+      ::ActiveRecord::VERSION::MAJOR == 4
+    end
+
   end
 end
 

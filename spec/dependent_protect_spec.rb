@@ -14,14 +14,14 @@ end
 
 class Order < ActiveRecord::Base
   belongs_to :category
-  has_one :order_invoice, :dependent => :restrict
+  has_one :order_invoice, :dependent => :restrict_with_exception
   def to_s
     "Order #{id}"
   end
 end
 
 class Category < ActiveRecord::Base
-  has_many :orders, :dependent => :restrict
+  has_many :orders, :dependent => :restrict_with_exception
   def to_s
     "Category #{id}"
   end
