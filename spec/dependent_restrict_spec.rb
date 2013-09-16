@@ -59,11 +59,11 @@ describe DependentRestrict do
     context 'when restricting with exception' do
       before do
         class Order < ActiveRecord::Base
-          has_one :order_invoice, dependent: :restrict_with_exception
+          has_one :order_invoice, :dependent => :restrict_with_exception
         end
 
         class Category < ActiveRecord::Base
-          has_many :orders, dependent: :restrict_with_exception do
+          has_many :orders, :dependent => :restrict_with_exception do
             def active
               self.select(&:active?)
             end
@@ -121,11 +121,11 @@ describe DependentRestrict do
     context 'when restricting with error' do
       before do
         class Order < ActiveRecord::Base
-          has_one :order_invoice, dependent: :restrict_with_error
+          has_one :order_invoice, :dependent => :restrict_with_error
         end
 
         class Category < ActiveRecord::Base
-          has_many :orders, dependent: :restrict_with_error do
+          has_many :orders, :dependent => :restrict_with_error do
             def active
               self.select(&:active?)
             end
