@@ -24,10 +24,10 @@ module DependentRestrict
     def has_one_with_restrict(*args) #:nodoc:
       reflection = if active_record_4?
         association_id, options, scope, extension = *args
-        create_reflection(:has_one, association_id, options, scope ||= {}, self)
+        create_reflection(:has_one, association_id, options || {}, scope || {}, self)
       else
         association_id, options, extension = *args
-        create_reflection(:has_one, association_id, options, self)
+        create_reflection(:has_one, association_id, options || {}, self)
       end
       add_dependency_callback!(reflection, options)
       has_one_without_restrict(*args) #association_id, options, &extension)
