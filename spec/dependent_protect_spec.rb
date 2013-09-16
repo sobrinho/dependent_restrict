@@ -37,6 +37,25 @@ describe DependentRestrict do
     end
 
 
+    context 'when not restricting' do
+      it 'should allow creating reflections' do
+        expect {
+          class Order < ActiveRecord::Base
+            has_one :order_invoice
+          end
+
+          class Category < ActiveRecord::Base
+            has_many :orders do
+              def active
+                self.select(&:active?)
+              end
+            end
+          end
+        }.to_not raise_error
+      end
+    end
+
+
     context 'when restricting with exception' do
       before do
         class Order < ActiveRecord::Base
