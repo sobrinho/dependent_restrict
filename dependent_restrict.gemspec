@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'dependent_restrict'
   s.version           = '0.1.0'
-  s.date              = '2013-09-14'
+  s.date              = '2013-10-02'
   s.rubyforge_project = 'dependent_restrict'
 
   ## Make sure your summary is short. The description may be as long
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.authors  = ["Michael Noack"]
   s.email    = 'development@travellink.com.au'
   s.homepage = 'http://github.com/sealink/dependent_restrict'
+  s.license  = 'MIT'
 
   ## This gets added to the $LOAD_PATH so that 'lib/NAME.rb' can be required as
   ## require 'NAME.rb' or'/lib/NAME/file.rb' can be as require 'NAME/file.rb'
@@ -68,7 +69,7 @@ Gem::Specification.new do |s|
     gemfiles/rails4.gemfile
     lib/dependent_restrict.rb
     lib/dependent_restrict/delete_restriction_error.rb
-    spec/dependent_protect_spec.rb
+    spec/dependent_restrict_spec.rb
     spec/schema.rb
     spec/spec_helper.rb
   ]
