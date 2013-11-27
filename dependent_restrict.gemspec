@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   ## the sub! line in the Rakefile
   s.name              = 'dependent_restrict'
   s.version           = '0.1.1'
-  s.date              = '2013-10-02'
+  s.date              = '2013-11-27'
   s.rubyforge_project = 'dependent_restrict'
 
   ## Make sure your summary is short. The description may be as long
