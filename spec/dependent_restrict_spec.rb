@@ -1,3 +1,4 @@
+#encoding: utf-8
 require 'spec_helper'
 
 DB_FILE = 'tmp/test_db'
@@ -114,6 +115,76 @@ describe DependentRestrict do
 
         Category.delete_all
         Order.delete_all
+      end
+
+      context "using i18n" do
+        before do
+          I18n.backend.store_translations(:br, {
+            :dependent_restrict => {
+              :basic_message => {
+                :one => 'Não pode ser excluído pois um(a) %{name} relacionado(a) foi encontrado(a)',
+                :others => 'Não pode ser excluído pois %{count} %{name} relacionados(as) foram encontrados(as)'
+              },
+              :detailed_message => {
+                :and_more => "e mais %{count}",
+                :includes => "Incluindo"
+              }
+            },
+            :activerecord => {
+              :models => {
+                :order => {
+                  :one => "Pedido",
+                  :other => "Pedidos"
+                },
+                :order_invoice => {
+                  :one => "Ordem de pedido"
+                }
+              }
+            }
+          })
+
+          I18n.locale = :br
+        end
+
+        after do
+          I18n.locale = :en
+        end
+
+        it 'should restrict has_many relationships' do
+
+          category = Category.create!
+          5.times { Order.create!(:category => category) }
+          expect { category.reload.destroy }.to raise_error(
+            ActiveRecord::DetailedDeleteRestrictionError,
+            'Não pode ser excluído pois 5 pedidos relacionados(as) foram encontrados(as)'
+          )
+          begin
+            category.destroy
+          rescue ActiveRecord::DetailedDeleteRestrictionError => e
+            e.detailed_message.should == "Não pode ser excluído pois 5 pedidos relacionados(as) foram encontrados(as)\n\n\nIncluindo:\n13: Order 13\n14: Order 14\n15: Order 15\n16: Order 16\n17: Order 17"
+          end
+          1.times { Order.create!(:category => category) }
+          begin
+            category.destroy
+          rescue ActiveRecord::DetailedDeleteRestrictionError => e
+            e.detailed_message.should == "Não pode ser excluído pois 6 pedidos relacionados(as) foram encontrados(as)\n\n\nIncluindo:\n13: Order 13\n14: Order 14\n15: Order 15\n16: Order 16\n...e mais 2"
+          end
+
+          Order.destroy_all
+          expect { category.reload.destroy }.to_not raise_error
+        end
+
+        it 'should restrict has_one relationships' do
+          order = Order.create!
+          order_invoice = OrderInvoice.create!(:order => order)
+          expect { order.reload.destroy }.to raise_error(
+            ActiveRecord::DetailedDeleteRestrictionError,
+            'Não pode ser excluído pois um(a) ordem de pedido relacionado(a) foi encontrado(a)'
+          )
+
+          order_invoice.destroy
+          expect { order.reload.destroy }.to_not raise_error
+        end
       end
     end
 
