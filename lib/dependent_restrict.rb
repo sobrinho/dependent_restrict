@@ -69,8 +69,10 @@ module DependentRestrict
         options.delete(:dependent)
         define_method(method_name) do
           method = reflection.collection? ? :empty? : :nil?
-          unless send(reflection.name).send(method)
-            raise ActiveRecord::DetailedDeleteRestrictionError.new(reflection.name, self)
+          record_or_collection = send(reflection.name)
+
+          unless record_or_collection.send(method)
+            raise ActiveRecord::DetailedDeleteRestrictionError.new(self, reflection.klass, record_or_collection)
           end
         end
         before_destroy method_name
