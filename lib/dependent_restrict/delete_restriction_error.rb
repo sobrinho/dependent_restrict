@@ -13,7 +13,12 @@ module ActiveRecord
 
     def basic_message
       count = @record_or_collection.respond_to?(:count) ? @record_or_collection.count : (@record_or_collection ? 1 : 0)
-      name = @klass.human_name(:count => count)
+      name = if @klass.respond_to?(:model_name)
+               @klass.model_name.human(count: count)
+             else
+               @klass.human_name(:count => count)
+             end
+
       default = count == 1 ? "Cannot delete record because dependent #{name} exists" : "Cannot delete record because #{count} dependent #{name.pluralize} exist"
 
       I18n.t('dependent_restrict.basic_message', :count => count, :name => name, :default => default)
